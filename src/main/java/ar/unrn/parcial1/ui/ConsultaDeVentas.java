@@ -1,5 +1,6 @@
 package ar.unrn.parcial1.ui;
 
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -11,8 +12,8 @@ import javax.swing.JTable;
 import javax.swing.border.EmptyBorder;
 import javax.swing.table.DefaultTableModel;
 
-import ar.unrn.parcial1.modelo.Venta;
-import ar.unrn.parcial1.modelo.Ventas;
+import ar.unrn.parcial1.modelo.EstacionDeServicio;
+import ar.unrn.parcial1.modelo.VentaPagada;
 
 import javax.swing.JTextField;
 import javax.swing.JButton;
@@ -23,20 +24,22 @@ import java.awt.event.ActionEvent;
 
 public class ConsultaDeVentas extends JFrame {
 
-    private JPanel contentPane;
-    private JTable table;
-    private DefaultTableModel modelo;
-    private List<Venta> listaVentas;
-    private JTextField fechaInicio;
-    private JTextField fechaFin;
-    private JButton buscar;
-    private JButton cancelar;
-    private JLabel inicio;
-    private JLabel fin;
-    private JLabel formateInicio;
-    private JLabel formatoFin;
+    private final JPanel contentPane;
+    private final JTable table;
+    private final DefaultTableModel modelo;
+    private List<VentaPagada> listaVentas;
+    private final JTextField fechaInicio;
+    private final JTextField fechaFin;
+    private final JButton buscar;
+    private final JButton cancelar;
+    private final JLabel inicio;
+    private final JLabel fin;
+    private final JLabel formatoInicio;
+    private final JLabel formatoFin;
+    private final EstacionDeServicio estacionDeServicio;
 
-    public ConsultaDeVentas(Ventas ventas) {
+    public ConsultaDeVentas(EstacionDeServicio estacionDeServicio) {
+        this.estacionDeServicio = estacionDeServicio;
         this.listaVentas = new ArrayList<>();
         setTitle("Consulta de ventas");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -50,7 +53,7 @@ public class ConsultaDeVentas extends JFrame {
 
         table = new JTable();
         table.setBounds(0, 0, 432, 237);
-        String titulos[] = {"FECHA", "LITROS CARGADOS", "MONTO"};
+        String[] titulos = {"FECHA", "LITROS CARGADOS", "MONTO"};
         modelo = new DefaultTableModel(new Object[][]{}, titulos) {
         };
         table.setModel(modelo);
@@ -73,9 +76,9 @@ public class ConsultaDeVentas extends JFrame {
             public void actionPerformed(ActionEvent e) {
                 try {
                     modelo.setRowCount(0);
-                    listaVentas = ventas.obtenerVentasPorFechas(fechaInicio.getText(), fechaFin.getText());
-                    for (Venta v : listaVentas) {
-                        modelo.addRow(new Object[]{v.fecha().toString(), v.litrosCargados(), v.monto()});
+                    listaVentas = estacionDeServicio.obtenerVentasEntreFechas(fechaInicio.getText(), fechaFin.getText());
+                    for (VentaPagada v : listaVentas) {
+                        modelo.addRow(new Object[]{v.fecha().format(DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss")), v.litrosCargados(), v.monto()});
                     }
                 } catch (RuntimeException r) {
                     JOptionPane.showMessageDialog(null, r.getMessage());
@@ -88,7 +91,7 @@ public class ConsultaDeVentas extends JFrame {
         cancelar = new JButton("Cancelar");
         cancelar.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                Principal ventana = new Principal(ventas);
+                Principal ventana = new Principal(estacionDeServicio);
                 ventana.setVisible(true);
                 dispose();
             }
@@ -104,16 +107,15 @@ public class ConsultaDeVentas extends JFrame {
         fin.setBounds(156, 271, 109, 14);
         contentPane.add(fin);
 
-        formateInicio = new JLabel("dd/mm/aaaa");
-        formateInicio.setFont(new Font("Tahoma", Font.ITALIC, 11));
-        formateInicio.setBounds(27, 306, 77, 14);
-        contentPane.add(formateInicio);
+        formatoInicio = new JLabel("dd/mm/aaaa");
+        formatoInicio.setFont(new Font("Tahoma", Font.ITALIC, 11));
+        formatoInicio.setBounds(27, 306, 77, 14);
+        contentPane.add(formatoInicio);
 
         formatoFin = new JLabel("dd/mm/aaaa");
         formatoFin.setFont(new Font("Tahoma", Font.ITALIC, 11));
         formatoFin.setBounds(156, 306, 77, 14);
         contentPane.add(formatoFin);
-
     }
 
 }

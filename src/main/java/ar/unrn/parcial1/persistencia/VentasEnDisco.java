@@ -8,22 +8,21 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.List;
 
-import ar.unrn.parcial1.modelo.Venta;
+import ar.unrn.parcial1.modelo.VentaPagada;
 import ar.unrn.parcial1.modelo.Ventas;
 
 public class VentasEnDisco implements Ventas {
-    private String path;
+    private final String path;
 
     public VentasEnDisco(String path) {
         this.path = path;
     }
 
     @Override
-    public void guardarVentas(Venta venta) {
+    public void guardarVentas(VentaPagada venta) {
         try {
             File archivo = new File(path);
             Writer writer = new FileWriter(archivo, true);
@@ -36,23 +35,19 @@ public class VentasEnDisco implements Ventas {
     }
 
     @Override
-    public List<Venta> obtenerVentasPorFechas(String fechaI, String fechaF) {
-        List<Venta> ventas = new ArrayList<Venta>();
+    public List<VentaPagada> obtenerVentasPorFechas(LocalDate fechaInicio, LocalDate fechaFin) {
+        List<VentaPagada> ventas = new ArrayList<>();
         try {
-            LocalDate fechaInicio = LocalDate.parse(fechaI, DateTimeFormatter.ofPattern("dd/MM/yyyy"));
-            LocalDate fechaFin = LocalDate.parse(fechaF, DateTimeFormatter.ofPattern("dd/MM/yyyy"));
             List<String> lines = Files.readAllLines(Paths.get(this.path));
             for (String l : lines) {
                 String[] datos = l.split(", ");
                 LocalDate fecha = LocalDate.parse(datos[0], DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss"));
-                if (fecha.isAfter(fechaInicio) && fecha.isBefore(fechaFin) || fecha.equals(fechaInicio)
-                        || fecha.equals(fechaFin))
-                    ventas.add(new Venta(datos[0], datos[1], datos[2]));
+                if (fecha.isAfter(fechaInicio) || fecha.equals(fechaInicio)
+                        && fecha.isBefore(fechaFin) || fecha.equals(fechaFin))
+                    ventas.add(new VentaPagada(datos[0], datos[1], datos[2]));
             }
         } catch (IOException e) {
             throw new RuntimeException("No se pudo obtener la lista de ventas", e);
-        } catch (DateTimeParseException e1) {
-            throw new RuntimeException("Ingrese la fecha como indica el formato.", e1);
         }
         return ventas;
     }

@@ -7,18 +7,16 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
-import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.List;
 
-import ar.unrn.parcial1.modelo.Venta;
+import ar.unrn.parcial1.modelo.VentaPagada;
 import ar.unrn.parcial1.modelo.Ventas;
 
 public class VentasJDBC implements Ventas {
 
     @Override
-    public void guardarVentas(Venta venta) {
+    public void guardarVentas(VentaPagada venta) {
         Connection conexion;
         try {
             conexion = obtenerConexion();
@@ -35,31 +33,26 @@ public class VentasJDBC implements Ventas {
         }
     }
 
-    public List<Venta> obtenerVentasPorFechas(String fechaI, String fechaF) {
-        List<Venta> ventas = new ArrayList<Venta>();
+    public List<VentaPagada> obtenerVentasPorFechas(LocalDate fechaInicio, LocalDate fechaFin) {
+        List<VentaPagada> ventas = new ArrayList<>();
         Connection conexion;
         try {
-            LocalDate fechaInicio = LocalDate.parse(fechaI, DateTimeFormatter.ofPattern("dd/MM/yyyy"));
-            LocalDate fechaFin = LocalDate.parse(fechaF, DateTimeFormatter.ofPattern("dd/MM/yyyy"));
             conexion = obtenerConexion();
             PreparedStatement st = conexion.prepareStatement("SELECT * FROM ventas ");
             ResultSet rs = st.executeQuery();
             while (rs.next()) {
                 if (rs.getTimestamp("fecha").toLocalDateTime().toLocalDate().isAfter(fechaInicio)
-                        && rs.getTimestamp("fecha").toLocalDateTime().toLocalDate().isBefore(fechaFin)
                         || rs.getTimestamp("fecha").toLocalDateTime().toLocalDate().equals(fechaInicio)
+                        && rs.getTimestamp("fecha").toLocalDateTime().toLocalDate().isBefore(fechaFin)
                         || rs.getTimestamp("fecha").toLocalDateTime().toLocalDate().equals(fechaFin))
-                    ventas.add(new Venta(rs.getTimestamp("fecha").toLocalDateTime(), rs.getDouble("litros_cargados"),
+                    ventas.add(new VentaPagada(rs.getTimestamp("fecha").toLocalDateTime(), rs.getDouble("litros_cargados"),
                             rs.getDouble("monto")));
             }
             rs.close();
             st.close();
             conexion.close();
         } catch (SQLException e) {
-            e.printStackTrace();
             throw new RuntimeException("No se pudo obtener la lista de ventas", e);
-        } catch (DateTimeParseException e1) {
-            throw new RuntimeException("Ingrese la fecha como indica el formato.", e1);
         }
         return ventas;
     }

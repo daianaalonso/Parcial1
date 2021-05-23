@@ -11,24 +11,24 @@ import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JComboBox;
 import javax.swing.JButton;
-import java.time.LocalDateTime;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
+import java.time.LocalDateTime;
 
 public class CargaDeCombustible extends JFrame {
 
-    private JPanel contentPane;
-    private JTextField litros;
-    private JComboBox<String> nafta;
-    private JLabel litrosCargados;
-    private JLabel tipoDeNafta;
-    private JButton totalAPagar;
-    private JButton confirmar;
-    private JButton cancelar;
-    private Ventas ventas;
+    private final JPanel contentPane;
+    private final JTextField litros;
+    private final JComboBox<Combustible> nafta;
+    private final JLabel litrosCargados;
+    private final JLabel tipoDeNafta;
+    private final JButton totalAPagar;
+    private final JButton confirmar;
+    private final JButton cancelar;
+    private final EstacionDeServicio estacionDeServicio;
 
-    public CargaDeCombustible(Ventas ventas) {
-        this.ventas = ventas;
+    public CargaDeCombustible(EstacionDeServicio estacionDeServicio) {
+        this.estacionDeServicio = estacionDeServicio;
         setTitle("Carga de combustible");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setBounds(100, 100, 445, 240);
@@ -52,18 +52,16 @@ public class CargaDeCombustible extends JFrame {
         tipoDeNafta.setBounds(35, 97, 90, 14);
         contentPane.add(tipoDeNafta);
 
-        nafta = new JComboBox<String>();
+        nafta = new JComboBox<>();
         nafta.setBounds(168, 89, 170, 30);
         contentPane.add(nafta);
-        nafta.addItem("Comun");
-        nafta.addItem("Super");
+        nafta.addItem(new Comun());
+        nafta.addItem(new Super());
 
         totalAPagar = new JButton("Total a pagar");
         totalAPagar.addActionListener(e -> {
-            double monto = 0;
-            Combustible combustible = this.tipoDeCombustible(nafta.getSelectedItem().toString());
             try {
-                monto = new Venta(LocalDateTime.now(), litros.getText(), combustible).monto();
+                double monto = estacionDeServicio.obtenerMonto(LocalDateTime.now(), litros.getText(), (Combustible) nafta.getSelectedItem());
                 JOptionPane.showMessageDialog(null, "Monto total a pagar: $" + monto, "AVISO",
                         JOptionPane.INFORMATION_MESSAGE);
             } catch (RuntimeException r) {
@@ -75,9 +73,8 @@ public class CargaDeCombustible extends JFrame {
 
         confirmar = new JButton("Confirmar pago");
         confirmar.addActionListener(e -> {
-            Combustible combustible = this.tipoDeCombustible(nafta.getSelectedItem().toString());
             try {
-                ventas.guardarVentas(new Venta(LocalDateTime.now(), litros.getText(), combustible));
+                estacionDeServicio.registrarVenta(LocalDateTime.now(), litros.getText(), (Combustible) nafta.getSelectedItem());
                 JOptionPane.showMessageDialog(null, "Se registró el pago correctamente.", "AVISO",
                         JOptionPane.INFORMATION_MESSAGE);
             } catch (RuntimeException r) {
@@ -90,7 +87,7 @@ public class CargaDeCombustible extends JFrame {
         cancelar = new JButton("Cancelar");
         cancelar.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                Principal ventana = new Principal(ventas);
+                Principal ventana = new Principal(estacionDeServicio);
                 ventana.setVisible(true);
                 dispose();
             }
@@ -98,14 +95,4 @@ public class CargaDeCombustible extends JFrame {
         cancelar.setBounds(10, 164, 103, 23);
         contentPane.add(cancelar);
     }
-
-    private Combustible tipoDeCombustible(String tipo) {
-        Combustible combustible;
-        if (tipo.equals("Comun"))
-            combustible = new Comun();
-        else
-            combustible = new Super();
-        return combustible;
-    }
-
 }

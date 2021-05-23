@@ -4,13 +4,13 @@ import java.time.DayOfWeek;
 import java.time.LocalDateTime;
 
 public class Super extends Combustible {
-    private double precio = 90;
+    private static final double PRECIO = 90;
 
     public Super() {
     }
 
     public double obtenerMonto(double litros, LocalDateTime fecha) {
-        double montoTotal = this.precio * litros;
+        double montoTotal = PRECIO * litros;
         if (esDomingo(fecha))
             montoTotal = montoTotal - (0.1 * montoTotal);
         if (esSabado(fecha) && litros > 20)

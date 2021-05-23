@@ -1,10 +1,11 @@
 package ar.unrn.parcial1.modelo;
 
+import java.time.LocalDate;
 import java.util.List;
 
 public interface Ventas {
 
-    void guardarVentas(Venta venta);
+    void guardarVentas(VentaPagada venta);
 
-    List<Venta> obtenerVentasPorFechas(String fechaInicio, String fechaFin);
+    List<VentaPagada> obtenerVentasPorFechas(LocalDate fechaInicio, LocalDate fechaFin);
 }

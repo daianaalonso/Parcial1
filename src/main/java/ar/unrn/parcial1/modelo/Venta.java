@@ -1,62 +1,32 @@
 package ar.unrn.parcial1.modelo;
 
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 
 public class Venta {
-    private LocalDateTime fecha;
-    private double litrosCargados;
-    private double monto;
+    private final LocalDateTime fecha;
+    private final double litrosCargados;
+    private final Combustible combustible;
 
     public Venta(LocalDateTime fecha, String litrosCargados, Combustible combustible) {
         if (litrosCargados == null || litrosCargados.isEmpty())
             throw new RuntimeException("Debe ingresar la cantidad de litros.");
-
-        if (Double.parseDouble(litrosCargados) < 1)
-            throw new RuntimeException("La cantidad de litros no puede ser 0.");
-
+        try {
+            this.litrosCargados = Double.parseDouble(litrosCargados);
+            if (this.litrosCargados < 1)
+                throw new RuntimeException("La cantidad de litros no puede ser 0.");
+        } catch (NumberFormatException e) {
+            throw new RuntimeException("Debe ingresar solo números.", e);
+        }
         this.fecha = fecha;
-        this.litrosCargados = Double.parseDouble(litrosCargados);
-        this.monto = combustible.obtenerMonto(Double.parseDouble(litrosCargados), fecha);
-    }
-
-    public Venta(LocalDateTime fecha, double litrosCargados, double monto) {
-        this.fecha = fecha;
-        this.litrosCargados = litrosCargados;
-        this.monto = monto;
-    }
-
-    public Venta(String fecha, String litrosCargados, String monto) {
-        if (fecha == null || fecha.isEmpty())
-            throw new RuntimeException("Debe ingresar la fecha.");
-
-        if (monto == null || monto.isEmpty())
-            throw new RuntimeException("Debe ingresar el monto.");
-
-        if (litrosCargados == null || litrosCargados.isEmpty())
-            throw new RuntimeException("Debe ingresar la cantidad de litros.");
-
-        if (Double.parseDouble(litrosCargados) < 1)
-            throw new RuntimeException("La cantidad de litros no puede ser 0.");
-
-        if (monto == null || monto.isEmpty())
-            throw new RuntimeException("Debe ingresar el monto.");
-
-        this.fecha = LocalDateTime.parse(fecha, DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss"));
-        this.litrosCargados = Double.parseDouble(litrosCargados);
-        this.monto = Double.parseDouble(monto);
+        this.combustible = combustible;
     }
 
     public double monto() {
-        return this.monto;
+        return combustible.obtenerMonto(this.litrosCargados, this.fecha);
     }
 
-    public LocalDateTime fecha() {
-        return this.fecha;
-    }
-
-    public double litrosCargados() {
-        return this.litrosCargados;
+    public VentaPagada pagar() {
+        return new VentaPagada(this.fecha, this.litrosCargados, monto());
     }
 
 }

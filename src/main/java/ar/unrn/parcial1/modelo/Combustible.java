@@ -9,4 +9,8 @@ public abstract class Combustible {
 
     public abstract double obtenerMonto(double litros, LocalDateTime fecha);
 
+    @Override
+    public String toString() {
+        return getClass().getSimpleName();
+    }
 }

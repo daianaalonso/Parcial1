@@ -4,7 +4,7 @@ import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
 
-import ar.unrn.parcial1.modelo.Ventas;
+import ar.unrn.parcial1.modelo.EstacionDeServicio;
 
 import javax.swing.JButton;
 import javax.swing.JLabel;
@@ -17,8 +17,10 @@ public class Principal extends JFrame {
     private JLabel menu;
     private JButton consultaDeVentas;
     private JButton cargaDeCombustible;
+    private EstacionDeServicio estacionDeServicio;
 
-    public Principal(Ventas ventas) {
+    public Principal(EstacionDeServicio estacionDeServicio) {
+        this.estacionDeServicio= estacionDeServicio;
         setTitle("Menu principal");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setBounds(100, 100, 390, 250);
@@ -32,7 +34,7 @@ public class Principal extends JFrame {
         cargaDeCombustible = new JButton("Carga de combustibles");
         cargaDeCombustible.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                CargaDeCombustible ventana = new CargaDeCombustible(ventas);
+                CargaDeCombustible ventana = new CargaDeCombustible(estacionDeServicio);
                 ventana.setVisible(true);
                 dispose();
             }
@@ -43,7 +45,7 @@ public class Principal extends JFrame {
         consultaDeVentas = new JButton("Consulta de ventas");
         consultaDeVentas.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                ConsultaDeVentas ventana = new ConsultaDeVentas(ventas);
+                ConsultaDeVentas ventana = new ConsultaDeVentas(estacionDeServicio);
                 ventana.setVisible(true);
                 dispose();
             }
