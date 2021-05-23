@@ -26,7 +26,7 @@ public class VentasEnTest implements Ventas {
         return lista;
     }
 
-    public boolean entreFechas(LocalDate fechaInicio, LocalDate fechaFin, LocalDate fecha) {
+    private boolean entreFechas(LocalDate fechaInicio, LocalDate fechaFin, LocalDate fecha) {
         return (fecha.isAfter(fechaInicio) || fecha.equals(fechaInicio)) && (fecha.isBefore(fechaFin) || fecha.equals(fechaFin));
     }
 
