@@ -1,0 +1,14 @@
+-- USUARIO root
+-- CONTRASEÑA no tiene
+
+-- CREACION DE BASE DE DATOS 
+
+CREATE DATABASE bd_alonso 
+
+-- CREACION DE TABLAS
+ 
+CREATE TABLE `ventas` (
+ `fecha` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
+ `litros_cargados` double NOT NULL,
+ `monto` double NOT NULL
+); 
